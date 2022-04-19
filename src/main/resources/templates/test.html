@@ -1,0 +1,49 @@
+<!DOCTYPE HTML>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+
+	<title>Test</title>
+</head>
+
+<body>
+
+<div class="container">
+
+	<!--<form method="POST" th:action="@{viewLine}">
+
+	<select class="form-control" name="seriesSelection" multiple="multiple">
+    <option th:each="option : ${options}" th:value="${option}" th:text="${option}"></option>
+	</select>
+	
+	<button class="btn btn-primary" type="submit">View</button> 
+	</form>-->
+	
+	
+	<form action="#" th:action="@{viewLine}"  th:object="${optionsObj}" method="POST">
+ <div class="container">
+  
+     <p><strong>Select Hobbies(Multiple):</strong>
+    <select id="multiple-hobbies" th:field="*{Option}" multiple="multiple">
+   
+    <option th:each="option: ${options}"
+              th:value="${option}" th:text="${option}">
+    </select>
+    </p>
+     <input type="submit" value="submit"/>
+</div>    
+   </form>
+	
+</div>
+	
+</body>
+</html>
+
+
+
