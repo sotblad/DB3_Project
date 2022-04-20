@@ -145,7 +145,7 @@ var svg = d3.select("#putTheSvg").append("svg")
 
 		  //Legend
 		  var legend = svg.selectAll(".legend")
-		      .data(data[0].values.map(function(d) { return d.pair; }).reverse())
+		      .data(seriesNames.map(function(d) { return d; }).reverse())
 		  .enter().append("g")
 		      .attr("class", "legend")
 		      .attr("transform", function(d,i) { return "translate(0," + i * 20 + ")"; })

@@ -62,8 +62,8 @@ var yAxis = d3.svg.axis().scale(y)
 
 // Define the line
 var priceline = d3.svg.line()
-    .x(function(d) { return x(d.date); })
-    .y(function(d) { return y(d.price); });
+    .x(function(d) { return x(d.xCoord); })
+    .y(function(d) { return y(d.xCoord); });
     
 // Adds the svg canvas
 var svg = d3.select("body")
@@ -75,15 +75,30 @@ var svg = d3.select("body")
               "translate(" + margin.left + "," + margin.top + ")");
 
 // Get the data
-d3.csv("stocks.csv", function(error, data) {
-    data.forEach(function(d) {
-  d.date = parseDate(d.date);
-  d.price = +d.price;
-    });
+var passedDataC = document.getElementById('vrblId').value;
+	   /* document.write("<p>passedDataC "+  passedDataC + "</p>"); */
+		data = JSON.parse(passedDataC);
+		
+		var xCoordsNames = data.map(function(d) { return d.xCoord; });
+		
+		var lookup = {};
+		var seriesNames = [];
+
+		for (var item, i = 0; item = data[i++];) {
+			for (var initem, j = 0; initem = item.values[j++];) {
+			  var pair = initem.pair;
+			
+			  if(!(pair in lookup)){
+			  	lookup[pair] = 1;
+			  	seriesNames.push(pair);
+			  }
+		  }
+		}
+
 
     // Scale the range of the data
-    x.domain(d3.extent(data, function(d) { return d.date; }));
-    y.domain([0, d3.max(data, function(d) { return d.price; })]); 
+    x.domain(d3.extent(data, function(d) { return d.xCoord; }));
+    y.domain([0, d3.max(data, function(xCoord) { return d3.max(xCoord.values, function(d) { return d.value; }); })]); 
 
     // Nest the entries by symbol
     var dataNest = d3.nest()
@@ -109,8 +124,6 @@ d3.csv("stocks.csv", function(error, data) {
     svg.append("g")
         .attr("class", "y axis")
         .call(yAxis);
-
-});
 
 </script>
 </body>
