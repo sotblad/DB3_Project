@@ -10,4 +10,6 @@ public interface StatisticsService {
 	
 	public Statistics findById(int theId);
 	
+	public List<Statistics> findByCountryAndIndicator(String country, String indicator);
+	
 }

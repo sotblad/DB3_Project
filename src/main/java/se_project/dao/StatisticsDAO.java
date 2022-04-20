@@ -11,5 +11,7 @@ import se_project.entity.Statistics;
 public interface StatisticsDAO extends JpaRepository<Statistics, Integer> {
 	
 	public Statistics findById(int theId);
+	
+	public List<Statistics> findByCountryAndIndicator(String country, String indicator);
 		
 }

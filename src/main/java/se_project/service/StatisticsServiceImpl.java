@@ -44,6 +44,20 @@ public class StatisticsServiceImpl implements StatisticsService {
 			throw new RuntimeException("Did not find stat id - " + theId);
 		}
 	}
+	
+	@Override
+	@Transactional
+	public List<Statistics> findByCountryAndIndicator(String Country, String Indicator) {
+		List<Statistics> result = statisticsRepository.findByCountryAndIndicator(Country, Indicator);
+				
+		if (result != null ) {
+			return result;
+		}
+		else {
+			// we didn't find the Course
+			throw new RuntimeException("Did not find.");
+		}
+	}
 }
 
 

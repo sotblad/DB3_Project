@@ -19,19 +19,19 @@ public class Statistics {
 	private String country;
 	
 	@Column(name="Year")
-	private String year;
+	private Integer year;
 	
 	@Column(name="Indicator")
 	private String indicator;
 	
 	@Column(name="Value")
-	private int value;
+	private Float value;
 
 	public Statistics() {
 		
 	}
 
-	public Statistics(int id, String country, String year, String indicator, int value) {
+	public Statistics(int id, String country, Integer year, String indicator, Float value) {
 		super();
 		this.country = country;
 		this.year = year;
@@ -55,11 +55,11 @@ public class Statistics {
 		this.country = country;
 	}
 
-	public String getYear() {
+	public Integer getYear() {
 		return year;
 	}
 
-	public void setYear(String year) {
+	public void setYear(Integer year) {
 		this.year = year;
 	}
 
@@ -71,11 +71,11 @@ public class Statistics {
 		this.indicator = indicator;
 	}
 
-	public int getValue() {
+	public Float getValue() {
 		return value;
 	}
 
-	public void setValue(int value) {
+	public void setValue(Float value) {
 		this.value = value;
 	}
 
