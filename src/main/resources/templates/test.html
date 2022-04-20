@@ -26,8 +26,14 @@
 	</form>-->
 	
 	
-	<form action="#" th:action="@{viewLine}"  th:object="${form}" method="POST">
+	<form action="#" th:action="@{chart}"  th:object="${form}" method="POST">
  <div class="container">
+ 
+             <td>Chart type: </td><br>
+               <th:block th:each="chart : ${charts}">
+                <input type="radio" name="chartType" th:value="${chart}"/>
+                 <label th:text="${chart}"></label>
+               </th:block>
   
      <p><strong>Select Metrics(Multiple):</strong>
     <select th:field="*{stats.statisticOption}" multiple="multiple" required>

@@ -40,17 +40,6 @@
 		<div id=putTheSvg>
 		</div>
 		
-		<!-- Whatever else with other info -->
-		<div id=debug>
-			<p>This is an example adapted from <a href="https://bl.ocks.org/bricedev/0d95074b6d83a77dc3ad">https://bl.ocks.org/bricedev/0d95074b6d83a77dc3ad</a>. Many thanks! </p>
-			<p class="text-primary">The code of this page can be used for any multi-series that has a Json description with 
-			(a) <code>xCoord</code> for the x-coordinates, 
-			(b) <code>series</code> for the series to which a measurement belongs, and, 
-			(c) <code>value</code> for the value of a measurement.</p>
-			
-			<p>What follows is a paragraph that shows what was passed as a JSON object</p>
-			<p><span th:text="${dataGiven}"></span></p>		
-		</div>
 		
 	<script>
 	var margin = {top: 20, right: 20, bottom: 30, left: 100},
@@ -90,7 +79,20 @@ var svg = d3.select("#putTheSvg").append("svg")
 		/* document.write("<p>AAA "+  data + "</p>"); */
 		
 		var xCoordsNames = data.map(function(d) { return d.xCoord; });
-		  var seriesNames = data[0].values.map(function(d) { return d.country; });
+		
+		var lookup = {};
+		var seriesNames = [];
+
+		for (var item, i = 0; item = data[i++];) {
+			for (var initem, j = 0; initem = item.values[j++];) {
+			  var pair = initem.pair;
+			
+			  if(!(pair in lookup)){
+			  	lookup[pair] = 1;
+			  	seriesNames.push(pair);
+			  }
+		  }
+		}
 
 		  x0.domain(xCoordsNames);
 		  x1.domain(seriesNames).rangeRoundBands([0, x0.rangeBand()]);
@@ -126,15 +128,15 @@ var svg = d3.select("#putTheSvg").append("svg")
 		      .data(function(d) { return d.values; })
 		  .enter().append("rect")
 		      .attr("width", x1.rangeBand())
-		      .attr("x", function(d) { return x1(d.country); })
-		      .style("fill", function(d) { return color(d.country) })
+		      .attr("x", function(d) { return x1(d.pair); })
+		      .style("fill", function(d) { return color(d.pair) })
 		      .attr("y", function(d) { return y(0); })
 		      .attr("height", function(d) { return height - y(0); })
 		      .on("mouseover", function(d) {
-		          d3.select(this).style("fill", d3.rgb(color(d.country)).darker(2));
+		          d3.select(this).style("fill", d3.rgb(color(d.pair)).darker(2));
 		      })
 		      .on("mouseout", function(d) {
-		          d3.select(this).style("fill", color(d.country));
+		          d3.select(this).style("fill", color(d.pair));
 		      });
 
 		  slice.selectAll("rect")
@@ -143,7 +145,7 @@ var svg = d3.select("#putTheSvg").append("svg")
 
 		  //Legend
 		  var legend = svg.selectAll(".legend")
-		      .data(data[0].values.map(function(d) { return d.country; }).reverse())
+		      .data(data[0].values.map(function(d) { return d.pair; }).reverse())
 		  .enter().append("g")
 		      .attr("class", "legend")
 		      .attr("transform", function(d,i) { return "translate(0," + i * 20 + ")"; })

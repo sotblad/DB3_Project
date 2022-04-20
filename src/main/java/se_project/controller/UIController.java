@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -68,6 +69,7 @@ public class UIController {
 	
 	@GetMapping("test")
 	public String getTest(Model model) {
+		String[] charts = {"barchart", "trendline"};
 		List<String> indNames = new ArrayList<>();
 		List<Indicators> indicators = indicatorsService.findAll();
 
@@ -81,11 +83,12 @@ public class UIController {
 		model.addAttribute("indOptions", indicators);
 		
 		model.addAttribute("form", new Option());
+		model.addAttribute("charts", charts);
 
 	    return "test";
 	}
 	
-	@PostMapping("viewLine")
+	@PostMapping("viewLineea")
 	public String getViewLine(@ModelAttribute("form")Option options, Model model) {
 		List<Countries> countriesList = new ArrayList<>();
 		List<Indicators> indList = new ArrayList<>();
@@ -147,15 +150,10 @@ public class UIController {
 		}
 		
 		//System.out.println(values);
-       // values.put(2020, 135.0);values.put(2021, 125.0);values.put(2022, 45.0);
-        
-        /* Sort the map: (a) make a sorted AL; (b) put them in a string in order
-         * The string also has a "header" with the names of the attributes in each pair.
-         * */
+
         List<Integer> sortedKeys=new ArrayList<Integer>(values.keySet());
         Collections.sort(sortedKeys);
         
-        String s ="xCoord, values\n";
         JSONArray json = new JSONArray();
         
         for(Integer i: sortedKeys) {
@@ -175,14 +173,79 @@ public class UIController {
         	json.put(obj);
        }
         System.out.println(json);
-       String constructedText = "This is some text that accompanies the data sent to the page. "
-       		+ "You can generate such a text to describe the query characteristics.";
-       String pageTitle = "Bar Chart";
         model.addAttribute("dataGiven", json);
 		
 	    return "viewLine";
 	}
 	
+	
+	
+	
+	
+	@PostMapping("chart")
+	public String getChart(@ModelAttribute("chartType")String chartType, @ModelAttribute("form")Option options, Model model) {
+		JSONArray json = new JSONArray();
+		List<Countries> countriesList = new ArrayList<>();
+		List<Indicators> indList = new ArrayList<>();
+		
+		List<String> countries = options.getCountries().getCountryOption();
+		List<String> stats = options.getStats().getStatisticOption();
+		
+		for(String country : countries) {
+			Countries tmpCountry = countriesService.findByCode(country);
+			countriesList.add(tmpCountry);
+		} // vriskei ta country objects pou epilexthikan
+		
+		for(String stat : stats) {
+			Indicators tmpIndicator = indicatorsService.findByCode(stat);
+			indList.add(tmpIndicator);
+		} // vriskei ta indicator objects pou epilexthikan
+		model.addAttribute("countries", countriesList);
+		model.addAttribute("stats", indList);
+		
+		List<Statistics> allData = new ArrayList<>();
+		List<Integer> years = new ArrayList<>();
+		for(String stat : stats) {
+			for(String country : countries) {
+				List<Statistics> statistics = statisticsService.findByCountryAndIndicator(country, stat);
+				for(Statistics statistic : statistics) {
+					if(!years.contains(statistic.getYear())) {
+						years.add(statistic.getYear());
+					}
+					allData.add(statistic);
+				}
+			}
+		}
+		
+		Collections.sort(years);
+		Collections.sort(allData, new Comparator<Statistics>(){
+			   public int compare(Statistics o1, Statistics o2){
+			      return o1.getYear() - o2.getYear();
+			   }
+			});
+
+		for(int year : years) {
+			JSONObject obj=new JSONObject();
+			obj.put("xCoord", year);
+			
+			JSONArray tmpArr = new JSONArray();
+			for(Statistics stat : allData) {
+				if(stat.getYear() == year) {
+					JSONObject tmpObj=new JSONObject();
+					tmpObj.put("pair", stat.getCountry() + " " + stat.getIndicator());
+					tmpObj.put("value", stat.getValue());
+					tmpArr.put(tmpObj);
+				}
+			}
+			obj.put("values", tmpArr);
+			json.put(obj);
+		}
+		
+		System.out.println(json);
+		model.addAttribute("dataGiven", json);
+		
+		return chartType;
+	}
 	
 }
 
