@@ -1,5 +1,10 @@
 <html>
 <div style="background: lightblue">
-<p th:each="option: ${options}" th:text="${option}">
+<h1>Selected Items:</h1>
+<hr>
+<h2>Countries:</h2>
+<span th:each="country, iterStat: ${countries}" th:text="!${iterStat.last} ? ${country.name} + ', ': ${country.name}"></span>
+<h2>Metrics:</h2>
+<p th:each="metric: ${stats}" th:text="${metric.name}">
 </div>
 </html>

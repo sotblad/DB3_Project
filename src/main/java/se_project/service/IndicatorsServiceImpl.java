@@ -46,6 +46,20 @@ public class IndicatorsServiceImpl implements IndicatorsService {
 			throw new RuntimeException("Did not find indicator id - " + theId);
 		}
 	}
+	
+	@Override
+	@Transactional
+	public Indicators findByCode(String theCode) {
+		Indicators result = indicatorsRepository.findByCode(theCode);
+				
+		if (result != null ) {
+			return result;
+		}
+		else {
+			// we didn't find the Course
+			throw new RuntimeException("Did not find indicator code - " + theCode);
+		}
+	}
 }
 
 

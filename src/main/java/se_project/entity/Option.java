@@ -3,13 +3,19 @@ package se_project.entity;
 import java.util.List;
 
 public class Option {
-	private List<String> option;
+	private CountryOption countries;
+	private StatisticOption stats;
 	
-	public List<String> getOption() {
-	    return option;
+	public CountryOption getCountries() {
+		return countries;
 	}
-	
-	public void setOption(List<String> option) {
-	    this.option = option;
+	public void setCountries(CountryOption countries) {
+		this.countries = countries;
+	}
+	public StatisticOption getStats() {
+		return stats;
+	}
+	public void setStats(StatisticOption stats) {
+		this.stats = stats;
 	}
 }

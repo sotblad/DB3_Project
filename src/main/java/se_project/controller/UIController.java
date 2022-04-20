@@ -21,9 +21,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import se_project.entity.Countries;
+import se_project.entity.CountryOption;
 import se_project.entity.Indicators;
 import se_project.entity.Option;
+import se_project.entity.StatisticOption;
 import se_project.entity.Statistics;
+import se_project.service.CountriesService;
 import se_project.service.IndicatorsService;
 import se_project.service.StatisticsService;
 
@@ -38,9 +42,13 @@ public class UIController {
 	@Autowired
 	private IndicatorsService indicatorsService;
 	
-	public UIController(StatisticsService theCourseService, IndicatorsService theIndicatorsService) {
+	@Autowired
+	private CountriesService countriesService;
+	
+	public UIController(StatisticsService theCourseService, IndicatorsService theIndicatorsService, CountriesService theCountriesService) {
 		courseService = theCourseService;
 		indicatorsService = theIndicatorsService;
+		countriesService= theCountriesService;
 	}
 	
 	@GetMapping("")
@@ -56,21 +64,42 @@ public class UIController {
 	public String getTest(Model model) {
 		List<String> indNames = new ArrayList<>();
 		List<Indicators> indicators = indicatorsService.findAll();
-		for(int i = 0;i < indicators.size(); i++) {
-			indNames.add(indicators.get(i).getName());
-		}
-		Option options = new Option();
-		options.setOption(indNames);
-		model.addAttribute("optionsObj", new Option());
-		model.addAttribute("options", indNames);
+
+		List<String> countryNames = new ArrayList<>();
+		List<Countries> countries = countriesService.findAll();
+
+		model.addAttribute("countryOptionsObj", new CountryOption());
+		model.addAttribute("countryOptions", countries);
+		
+		model.addAttribute("indOptionsObj", new StatisticOption());
+		model.addAttribute("indOptions", indicators);
+		
+		model.addAttribute("form", new Option());
 
 	    return "test";
 	}
 	
 	@PostMapping("viewLine")
-	public String getViewLine(@ModelAttribute("optionsObj")Option option, Model model) {
-		model.addAttribute("options", option.getOption());
-
+	public String getViewLine(@ModelAttribute("form")Option options, Model model) {
+		List<Countries> countriesList = new ArrayList<>();
+		List<Indicators> indList = new ArrayList<>();
+		
+		List<String> countries = options.getCountries().getCountryOption();
+		List<String> stats = options.getStats().getStatisticOption();
+		
+		for(String country : countries) {
+			Countries tmpCountry = countriesService.findByCode(country);
+			countriesList.add(tmpCountry);
+		}
+		
+		for(String stat : stats) {
+			Indicators tmpIndicator = indicatorsService.findByCode(stat);
+			indList.add(tmpIndicator);
+		}
+		
+		model.addAttribute("countries", countriesList);
+		model.addAttribute("stats", indList);
+		
 	    return "viewLine";
 	}
 	

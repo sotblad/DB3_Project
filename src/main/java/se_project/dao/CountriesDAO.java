@@ -5,14 +5,15 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import se_project.entity.Countries;
 import se_project.entity.Indicators;
 import se_project.entity.Statistics;
 
 @Repository
-public interface IndicatorsDAO extends JpaRepository<Indicators, Integer> {
+public interface CountriesDAO extends JpaRepository<Countries, Integer> {
 	
-	public Indicators findById(int theId);
+	public Countries findById(int theId);
 	
-	public Indicators findByCode(String stat);
+	public Countries findByCode(String theCode);
 		
 }

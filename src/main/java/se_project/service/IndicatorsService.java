@@ -10,4 +10,6 @@ public interface IndicatorsService {
 	
 	public Indicators findById(int theId);
 	
+	public Indicators findByCode(String stat);
+	
 }

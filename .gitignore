@@ -1,4 +1,6 @@
 countries/*
+src/main/resources/application.properties
+etl.py
 HELP.md
 target/
 !.mvn/wrapper/maven-wrapper.jar

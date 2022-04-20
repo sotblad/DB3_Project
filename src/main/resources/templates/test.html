@@ -26,14 +26,22 @@
 	</form>-->
 	
 	
-	<form action="#" th:action="@{viewLine}"  th:object="${optionsObj}" method="POST">
+	<form action="#" th:action="@{viewLine}"  th:object="${form}" method="POST">
  <div class="container">
   
-     <p><strong>Select Hobbies(Multiple):</strong>
-    <select id="multiple-hobbies" th:field="*{Option}" multiple="multiple">
+     <p><strong>Select Metrics(Multiple):</strong>
+    <select th:field="*{stats.statisticOption}" multiple="multiple" required>
    
-    <option th:each="option: ${options}"
-              th:value="${option}" th:text="${option}">
+    <option th:each="indOption: ${indOptions}"
+              th:value="${indOption.code}" th:text="${indOption.name}">
+    </select>
+    </p>
+    
+    <p><strong>Select Country(Multiple):</strong>
+    <select th:field="*{countries.countryOption}" multiple="multiple" required>
+   
+    <option th:each="countryOption: ${countryOptions}"
+              th:value="${countryOption.code}" th:text="${countryOption.name}">
     </select>
     </p>
      <input type="submit" value="submit"/>
