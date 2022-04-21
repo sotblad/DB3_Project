@@ -181,6 +181,9 @@ public class UIController {
 				JSONArray tmpArr = new JSONArray();
 				for(Statistics stat : allData) {
 					if(stat.getYear() == year) {
+						if(!scatterYears.contains(year)) {
+							scatterYears.add(year);
+						}
 						JSONObject tmpObj=new JSONObject();
 						tmpObj.put("country", stat.getCountry());
 						tmpObj.put("pair", stat.getCountry() + " " + stat.getIndicator());

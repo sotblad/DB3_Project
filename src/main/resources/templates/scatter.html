@@ -57,6 +57,7 @@ body {
 <br>
   		<button id="klik" type="button" class="btn btn-primary">Submit</button>
 	</div>
+	<button id="cln" type="button" class="btn btn-primary">Clean selections</button>
 	<div class="container mt-3">  	
 		<!-- We assign a hidden object to hold the pass variable. This allows client-side js, later, to use it -->
 		<input type="hidden" id="vrblId" name="vrblName" value="placeholder" th:value="${dataGiven}" />
@@ -230,6 +231,11 @@ var tooltip = d3.select("#putTheSvg").append("div")
 var values = Array.from(options).map(({ value }) => parseInt(value));
 	d3.select("#chart").remove();
     myFunction(dataa(values));
+  }, false);
+  
+    const cln = document.getElementById("cln");
+  cln.addEventListener("click", function () {
+  document.querySelectorAll('.selected').forEach(e => e.click());
   }, false);
 
 </script>
