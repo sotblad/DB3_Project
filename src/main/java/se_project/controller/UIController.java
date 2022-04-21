@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpSession;
@@ -40,7 +41,6 @@ import se_project.service.StatisticsService;
 
 @Controller
 @RequestMapping("/dashboard")
-//@SessionAttributes("employees")
 public class UIController {
 
 	@Autowired
@@ -69,7 +69,7 @@ public class UIController {
 	
 	@GetMapping("test")
 	public String getTest(Model model) {
-		String[] charts = {"barchart", "trendline"};
+		String[] charts = {"barchart", "trendline", "scatter"};
 		List<String> indNames = new ArrayList<>();
 		List<Indicators> indicators = indicatorsService.findAll();
 
@@ -87,100 +87,6 @@ public class UIController {
 
 	    return "test";
 	}
-	
-	@PostMapping("viewLineea")
-	public String getViewLine(@ModelAttribute("form")Option options, Model model) {
-		List<Countries> countriesList = new ArrayList<>();
-		List<Indicators> indList = new ArrayList<>();
-		
-		List<String> countries = options.getCountries().getCountryOption();
-		List<String> stats = options.getStats().getStatisticOption();
-		
-		String tsv = "date\t";
-		for(String country : countries) {
-			Countries tmpCountry = countriesService.findByCode(country);
-			countriesList.add(tmpCountry);
-			tsv += country + "\t";
-		} // ftiaxnei ta columns me ta country codes
-		
-		for(String stat : stats) {
-			Indicators tmpIndicator = indicatorsService.findByCode(stat);
-			indList.add(tmpIndicator);
-		} // vriskei ta indicator objects
-		
-		List<Integer> years = new ArrayList<>();
-		List<Statistics> finalStats = new ArrayList<>();
-		for(int i = 0;i<countries.size();i++) {
-			for(int j = 0;j<stats.size();j++) {
-				List<Statistics> statistics = statisticsService.findByCountryAndIndicator(countries.get(i), stats.get(j));
-				for(Statistics stat : statistics) {
-					finalStats.add(stat);
-					if(!years.contains(stat.getYear())) {
-						years.add(stat.getYear());
-					}
-				}
-			}
-		} // apothikevei ola ta statistika apo oles tis xwres gia oles tis xronologies
-		
-		Collections.sort(finalStats, new Comparator<Statistics>(){
-			   public int compare(Statistics o1, Statistics o2){
-			      return o1.getYear() - o2.getYear();
-			   }
-			});
-		
-		Collections.sort(years); // apothikevei ta years sorted
-		tsv += "\n";
-		System.out.println(finalStats);
-		
-		model.addAttribute("countries", countriesList);
-		model.addAttribute("stats", indList);
-		model.addAttribute("data", tsv);
-		
-		
-		
-		HashMap<Integer, HashMap<String, Float>> values = new HashMap<Integer, HashMap<String, Float>>();
-		for(int year : years) {
-			HashMap<String, Float> in = new HashMap<String, Float>();
-			for(Statistics stat : finalStats) {
-				if(stat.getYear() == year) {
-					in.put(stat.getCountry(), stat.getValue());
-				}
-			}
-			values.put(year, in);
-		}
-		
-		//System.out.println(values);
-
-        List<Integer> sortedKeys=new ArrayList<Integer>(values.keySet());
-        Collections.sort(sortedKeys);
-        
-        JSONArray json = new JSONArray();
-        
-        for(Integer i: sortedKeys) {
-        	JSONObject obj=new JSONObject();
-        	HashMap<String, Float> v = values.get(i);
-        	
- 	       obj.put("xCoord", i);
- 	       
-        	JSONArray ja = new JSONArray();
-        	for(String k : v.keySet()) {
-        		JSONObject jObjd=new JSONObject();
-        	       jObjd.put("country", k);
-        	       jObjd.put("value", v.get(k));
-        	       ja.put(jObjd);
-        	}
-        	obj.put("values", ja);
-        	json.put(obj);
-       }
-        System.out.println(json);
-        model.addAttribute("dataGiven", json);
-		
-	    return "viewLine";
-	}
-	
-	
-	
-	
 	
 	@PostMapping("chart")
 	public String getChart(@ModelAttribute("chartType")String chartType, @ModelAttribute("form")Option options, Model model) {
@@ -200,6 +106,11 @@ public class UIController {
 			Indicators tmpIndicator = indicatorsService.findByCode(stat);
 			indList.add(tmpIndicator);
 		} // vriskei ta indicator objects pou epilexthikan
+		
+		if(chartType.contentEquals("scatter") && stats.size() != 2) {
+			return "error";
+		}
+		
 		model.addAttribute("countries", countriesList);
 		model.addAttribute("stats", indList);
 		
@@ -223,25 +134,66 @@ public class UIController {
 			      return o1.getYear() - o2.getYear();
 			   }
 			});
-
-		for(int year : years) {
-			JSONObject obj=new JSONObject();
-			obj.put("xCoord", year);
-			
-			JSONArray tmpArr = new JSONArray();
-			for(Statistics stat : allData) {
-				if(stat.getYear() == year) {
-					JSONObject tmpObj=new JSONObject();
-					tmpObj.put("pair", stat.getCountry() + " " + stat.getIndicator());
-					tmpObj.put("value", stat.getValue());
-					tmpArr.put(tmpObj);
-				}
-			}
-			obj.put("values", tmpArr);
-			json.put(obj);
-		}
 		
-		System.out.println(json);
+		List<Integer> scatterYears = new ArrayList<>();
+		if(chartType.contentEquals("scatter")) {
+			for(int year : years) {
+				JSONObject obj=new JSONObject();
+				obj.put("xCoord", year);
+				obj.put("indicator1", stats.get(0));
+				obj.put("indicator2", stats.get(1));
+				
+				HashMap<String, List<Statistics>> tmps = new HashMap<String, List<Statistics>>();
+				JSONArray tmpArr = new JSONArray();
+				for(Statistics stat : allData) {
+						if(stat.getYear() == year) {
+							tmps.computeIfAbsent(stat.getCountry(), k -> new ArrayList<>()).add(stat);
+						}
+				}
+			//	System.out.println(year + " " + tmps);
+				for (Entry<String, List<Statistics>> set : tmps.entrySet()) {
+					if(set.getValue().size() == stats.size()) {
+						JSONObject tmpObj=new JSONObject();
+						int cnt = 1;
+						for(Statistics stat : set.getValue()) {
+							if(!scatterYears.contains(year)) {
+								scatterYears.add(year);
+							}
+							System.out.println(stat);
+							//tmpObj.put("indicator" + cnt, stat.getIndicator());
+							tmpObj.put("country", set.getKey());
+							tmpObj.put("stat" + cnt, stat.getValue());
+							cnt += 1;
+						}
+						
+						
+						tmpArr.put(tmpObj);
+					}
+				}
+				obj.put("values", tmpArr);
+				json.put(obj);
+			}
+		}else {
+			for(int year : years) {
+				JSONObject obj=new JSONObject();
+				obj.put("xCoord", year);
+				
+				JSONArray tmpArr = new JSONArray();
+				for(Statistics stat : allData) {
+					if(stat.getYear() == year) {
+						JSONObject tmpObj=new JSONObject();
+						tmpObj.put("country", stat.getCountry());
+						tmpObj.put("pair", stat.getCountry() + " " + stat.getIndicator());
+						tmpObj.put("value", stat.getValue());
+						tmpArr.put(tmpObj);
+					}
+				}
+				obj.put("values", tmpArr);
+				json.put(obj);
+			}
+		}
+		System.out.println(scatterYears);
+		model.addAttribute("listYears", scatterYears);
 		model.addAttribute("dataGiven", json);
 		
 		return chartType;

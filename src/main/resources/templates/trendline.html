@@ -30,7 +30,7 @@
 </div>
 
 <div class="container mt-3">
-  		<h1>Bar Chart </h1>
+  		<h1>Timeline/Trendline </h1>
 	</div>
 	<div class="container mt-3">  	
 		<!-- We assign a hidden object to hold the pass variable. This allows client-side js, later, to use it -->
@@ -42,37 +42,6 @@
 		
 		
 	<script>
-var margin = {top: 30, right: 20, bottom: 30, left: 50},
-    width = 600 - margin.left - margin.right,
-    height = 270 - margin.top - margin.bottom;
-
-// Parse the date / time
-var parseDate = d3.time.format("%b %Y").parse; 
-
-// Set the ranges
-var x = d3.time.scale().range([0, width]);
-var y = d3.scale.linear().range([height, 0]);
-
-// Define the axes
-var xAxis = d3.svg.axis().scale(x)
-    .orient("bottom").ticks(5);
-
-var yAxis = d3.svg.axis().scale(y)
-    .orient("left").ticks(5);
-
-// Define the line
-var priceline = d3.svg.line()
-    .x(function(d) { return x(d.xCoord); })
-    .y(function(d) { return y(d.xCoord); });
-    
-// Adds the svg canvas
-var svg = d3.select("body")
-    .append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-        .attr("transform", 
-              "translate(" + margin.left + "," + margin.top + ")");
 
 // Get the data
 var passedDataC = document.getElementById('vrblId').value;
@@ -95,36 +64,133 @@ var passedDataC = document.getElementById('vrblId').value;
 		  }
 		}
 
+var margin = {top: 20, right: 100, bottom: 30, left: 50},
+    width = 1280 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
 
-    // Scale the range of the data
-    x.domain(d3.extent(data, function(d) { return d.xCoord; }));
-    y.domain([0, d3.max(data, function(xCoord) { return d3.max(xCoord.values, function(d) { return d.value; }); })]); 
+var x = d3.time.scale()
+    .range([0, width]);
 
-    // Nest the entries by symbol
-    var dataNest = d3.nest()
-        .key(function(d) {return d.symbol;})
-        .entries(data);
+var y = d3.scale.linear()
+    .range([height, 0]);
 
-    // Loop through each symbol / key
-    dataNest.forEach(function(d) {
+var color = d3.scale.category10();
 
-        svg.append("path")
-            .attr("class", "line")
-            .attr("d", priceline(d.values)); 
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom")
+    .tickFormat(function (d){
+    return d3.format()(d);
+});
 
-    });
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left");
 
-    // Add the X Axis
-    svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + height + ")")
-        .call(xAxis);
+var line = d3.svg.line()
+    .x(function(d) { return x(d.date); })
+    .y(function(d) { return y(d.value); });
 
-    // Add the Y Axis
-    svg.append("g")
-        .attr("class", "y axis")
-        .call(yAxis);
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+  color.domain(d3.keys(seriesNames).filter(function(key) { return seriesNames[key] }));
+
+  var cities = color.domain().map(function(name) {
+  	var tmp = data.map(function(d) {
+      //console.log(d.values)
+	      var tmp = -1;
+	      for (var item, i = 0; item = d.values[i++];) {
+	      	if(item.pair == seriesNames[name]){
+	      		tmp = item.value;
+	      	}
+	      }
+        return {date: d.xCoord, value: tmp};
+      });
+      
+      if(tmp != -1)
+	    return {
+	      name: seriesNames[name],
+	      values: tmp
+	    };
+  });
+
+  x.domain(d3.extent(data, function(d) { return d.xCoord; }));
+
+  y.domain([
+    d3.min(cities, function(c) { return d3.min(c.values, function(v) { return v.value; }); }),
+    d3.max(cities, function(c) { return d3.max(c.values, function(v) { return v.value; }); })
+  ]);
+
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end");
+
+  var city = svg.selectAll(".city")
+      .data(cities)
+    .enter().append("g")
+      .attr("class", "city");
+
+  city.append("path")
+      .attr("class", "line")
+      .attr("d", function(d) { return line(d.values); })
+      .style("stroke", function(d) { return color(d.name); })
+      .style("fill","none");
+
+ // city.append("text")
+ //     .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
+ //     .attr("transform", function(d) { return "translate(" + x(d.value.date) + "," + y(d.value.value) + ")"; })
+ //     .attr("x", 3)
+ //     .attr("dy", ".35em")
+ //     .text(function(d) { return d.name; });
+
+  city.selectAll("circle")
+    .data(function(d){return d.values})
+    .enter()
+    .append("circle")
+    .attr("r", 3)
+    .attr("cx", function(d) { return x(d.date); })
+    .attr("cy", function(d) { return y(d.value); })
+    .style("fill", function(d,i,j) { return color(cities[j].name); });
+    
+    var legend = svg.selectAll(".legend")
+		      .data(seriesNames.map(function(d) { return d; }).reverse())
+		  .enter().append("g")
+		      .attr("class", "legend")
+		      .attr("transform", function(d,i) { return "translate(0," + i * 20 + ")"; })
+		      .style("opacity","0");
+
+		  legend.append("rect")
+		      .attr("x", width - 18)
+		      .attr("width", 18)
+		      .attr("height", 18)
+		      .style("fill", function(d) { return color(d); });
+
+		  legend.append("text")
+		      .attr("x", width - 24)
+		      .attr("y", 9)
+		      .attr("dy", ".35em")
+		      .style("text-anchor", "end")
+		      .text(function(d) {return d; });
+		      
+		      legend.style("opacity","1");
+
 
 </script>
+
 </body>
 </html>
