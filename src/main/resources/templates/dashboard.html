@@ -19,13 +19,15 @@
 .bootstrap-select:not([class*=col-]):not([class*=form-control]):not(.input-group-btn){
 	width: 100%;
 }
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+
+.box{
+	margin-top: 2%;
+	background: lightblue;
+	border-radius: 40px;
+	height: 430px;
 }
 
-html,body{
+html{
     width:100%;
     height:100%;
 }
@@ -98,8 +100,8 @@ html,body{
 }
 
 body {
-  margin: 0;
   font-family: "Helvetica Neue", "Open Sans";
+  background:#50c395;
 }
 
 #section-intro {
@@ -126,7 +128,6 @@ body {
 #section-intro nav {
   z-index: 2;
   width: 100%;
-  position: fixed;
   top: 0;
   display: flex;
   align-items: center;
@@ -185,31 +186,30 @@ nav #nav-draw {
 }
 </style>
 
-<title>Test</title>
+<title>DataGraph</title>
+<section id="section-intro">
+  <nav>
+    <header id="nav-left">
+      <a id="nav-title" href="">DataGraph</a>
+    </header>
+    <div id="nav-right">
+      <a class="nav-right-link" id="nav-board" href="https://github.com/sotblad/pvassil" target="_new">GitHub</a>
+    </div>
+  </nav>
+</section>
 </head>
 
 <body>
 
-<section id="section-intro">
-  <nav>
-    <header id="nav-left">
-      <a id="nav-title" href="http://www.leafie.io/home">leafie</a>
-    </header>
-    <div id="nav-right">
-      <a class="nav-right-link" id="nav-board" href="#section-board">The Board</a>
-      <a class="nav-right-link" id="nav-code" href="#section-code">Code Editor</a>
-      <a class="nav-right-link" id="nav-draw" href="#section-draw">Drawing Canvas</a>
-      <a class="nav-right-link" id="nav-write" href="#section-write">Writing Area</a>
-    </div>
-  </nav>
-
-<div class="container">
+<div class="container box">
+	<div>
+	<br>
    <form action="#" th:action="@{chart}"  th:object="${form}" method="POST">
       <div class="container">
          <div class="containera">
             <div class="selector">
                <div class="selecotr-item" th:each="chart, iter : ${charts}">
-                  <input type="radio" th:id="radio+${iter.index}" class="selector-item_radio" name="chartType" th:value="${chart}" required/>
+                  <input type="radio" th:id="radio+${iter.index}" class="selector-item_radio" name="chartType" th:value="${chart}" required th:checked="${iter.index} == 0" />
                   <label th:for="radio+${iter.index}" class="selector-item_label" th:text="${chart.toUpperCase()}"></label>
                </div>
             </div>
@@ -230,11 +230,11 @@ nav #nav-draw {
             </select>
          </div>
          </p>
-         <button type="submit" class="btn btn-primary">Submit</button>
+         <button type="submit" class="btn btn-primary" style="display: block;margin-left: auto;margin-right: 10px;">Submit</button>
       </div>
    </form>
+   </div>
 </div>
-</section>
 
 </body>
 </html>

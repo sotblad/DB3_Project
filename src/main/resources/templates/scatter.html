@@ -36,7 +36,7 @@ body {
 </head>
 
 <body>
-<div style="background: lightblue">
+<div style="background: #50c395">
 <h1>Selected Items:</h1>
 <hr>
 <h2>Countries:</h2>
@@ -57,6 +57,7 @@ body {
 <br>
   		<button id="klik" type="button" class="btn btn-primary">Submit</button>
 	</div>
+	<a href=".."><button class="btn btn-primary hBack" type="button">Back</button></a>
 	<button id="cln" type="button" class="btn btn-primary">Clean selections</button>
 	<div class="container mt-3">  	
 		<!-- We assign a hidden object to hold the pass variable. This allows client-side js, later, to use it -->
@@ -225,6 +226,7 @@ var tooltip = d3.select("#putTheSvg").append("div")
       
 }
 
+  myFunction(dataa([]));
   const element = document.getElementById("klik");
   element.addEventListener("click", function () {
   var options = document.getElementById('years').selectedOptions;

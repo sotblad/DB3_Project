@@ -19,8 +19,6 @@ import org.json.CDL;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,7 +38,6 @@ import se_project.service.IndicatorsService;
 import se_project.service.StatisticsService;
 
 @Controller
-@RequestMapping("/dashboard")
 public class UIController {
 
 	@Autowired
@@ -59,15 +56,6 @@ public class UIController {
 	}
 	
 	@GetMapping("")
-	public String dashboard(Model model) {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		
-	    model.addAttribute("user", authentication.getName());
-
-	    return "dashboard/dashboard";
-	}
-	
-	@GetMapping("test")
 	public String getTest(Model model) {
 		String[] charts = {"barchart", "trendline", "scatter"};
 		List<String> indNames = new ArrayList<>();
@@ -85,7 +73,7 @@ public class UIController {
 		model.addAttribute("form", new Option());
 		model.addAttribute("charts", charts);
 
-	    return "test";
+	    return "dashboard";
 	}
 	
 	@PostMapping("chart")
@@ -135,7 +123,7 @@ public class UIController {
 			   }
 			});
 		
-		List<Integer> scatterYears = new ArrayList<>();
+		List<Integer> selectionYears = new ArrayList<>();
 		if(chartType.contentEquals("scatter")) {
 			for(int year : years) {
 				JSONObject obj=new JSONObject();
@@ -156,8 +144,8 @@ public class UIController {
 						JSONObject tmpObj=new JSONObject();
 						int cnt = 1;
 						for(Statistics stat : set.getValue()) {
-							if(!scatterYears.contains(year)) {
-								scatterYears.add(year);
+							if(!selectionYears.contains(year)) {
+								selectionYears.add(year);
 							}
 							System.out.println(stat);
 							//tmpObj.put("indicator" + cnt, stat.getIndicator());
@@ -181,8 +169,8 @@ public class UIController {
 				JSONArray tmpArr = new JSONArray();
 				for(Statistics stat : allData) {
 					if(stat.getYear() == year) {
-						if(!scatterYears.contains(year)) {
-							scatterYears.add(year);
+						if(!selectionYears.contains(year)) {
+							selectionYears.add(year);
 						}
 						JSONObject tmpObj=new JSONObject();
 						tmpObj.put("country", stat.getCountry());
@@ -195,8 +183,8 @@ public class UIController {
 				json.put(obj);
 			}
 		}
-		System.out.println(scatterYears);
-		model.addAttribute("listYears", scatterYears);
+		
+		model.addAttribute("listYears", selectionYears);
 		model.addAttribute("dataGiven", json);
 		
 		return chartType;
