@@ -25,20 +25,46 @@
 		  height: 28px;
 		  pointer-events: none;
 		}
+		
+		p {
+	line-height: 0;
+}
+		
+		.div-left{
+    float:left;
+    padding-left:10px;
+}
+.div-right{
+    float:right;
+    padding-right:10px;
+}
+.container1{
+	background:#50c395;
+    height:auto;
+    padding-top:5px;
+    padding-bottom:5px;
+    overflow: hidden;
+}
 
 	</style>
 </head>
 
 <body>
-<div style="background: #50c395">
+<div class="container1">
 <h1>Selected Items:</h1>
 <hr>
+<div class="div-left">
 <h2>Countries:</h2>
 <span th:each="country, iterStat: ${countries}" th:text="!${iterStat.last} ? ${country.name} + ', ': ${country.name}"></span>
+</div>
+<div class="div-right">
 <h2>Metrics:</h2>
 <p th:each="metric: ${stats}" th:text="${metric.name}">
 </div>
-<a href=".."><button class="btn btn-primary hBack" type="button" style="position:absolute;">Back</button></a>
+</div>
+<div style="position: fixed; bottom: 0px; left: 0px;">
+<a href=".."><button class="btn btn-primary hBack" type="button">Back</button></a>
+</div>
 <div class="container mt-3">
   		<h1>Timeline/Trendline </h1>
 	
@@ -97,7 +123,7 @@ function myFunction(dat) {
     data = dat[0]
     seriesNames = dat[1]
 	var margin = {top: 20, right: 10, bottom: 30, left: 150},
-	    width = 1480 - margin.left - margin.right,
+	    width = 1280 - margin.left - margin.right,
 	    height = 500 - margin.top - margin.bottom;
 	
 	var x = d3.time.scale()

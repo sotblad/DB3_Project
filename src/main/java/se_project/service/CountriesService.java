@@ -12,4 +12,6 @@ public interface CountriesService {
 	
 	public Countries findByCode(String theCode);
 	
+	public List<Countries> getCountriesByStrings(List<String> countries);
+	
 }

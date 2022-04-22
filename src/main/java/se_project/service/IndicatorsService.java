@@ -2,6 +2,7 @@ package se_project.service;
 
 import java.util.List;
 
+import se_project.entity.Countries;
 import se_project.entity.Indicators;
 
 public interface IndicatorsService {
@@ -11,5 +12,7 @@ public interface IndicatorsService {
 	public Indicators findById(int theId);
 	
 	public Indicators findByCode(String stat);
+	
+	public List<Indicators> getIndicatorsByStrings(List<String> indicators);
 	
 }

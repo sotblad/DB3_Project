@@ -1,5 +1,6 @@
 package se_project.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import se_project.dao.IndicatorsDAO;
 import se_project.dao.StatisticsDAO;
+import se_project.entity.Countries;
 import se_project.entity.Indicators;
 import se_project.entity.Statistics;
 
@@ -59,6 +61,16 @@ public class IndicatorsServiceImpl implements IndicatorsService {
 			// we didn't find the Course
 			throw new RuntimeException("Did not find indicator code - " + theCode);
 		}
+	}
+
+	@Override
+	public List<Indicators> getIndicatorsByStrings(List<String> indicators) {
+		List<Indicators> indicatorsList = new ArrayList<>();
+		
+		for(String indicator : indicators) {
+			indicatorsList.add(this.findByCode(indicator));
+		}
+		return indicatorsList;
 	}
 }
 

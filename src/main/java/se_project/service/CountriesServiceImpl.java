@@ -1,5 +1,6 @@
 package se_project.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +62,16 @@ public class CountriesServiceImpl implements CountriesService {
 			// we didn't find the Country
 			throw new RuntimeException("Did not find country code - " + theCode);
 		}
+	}
+
+	@Override
+	public List<Countries> getCountriesByStrings(List<String> countries) {
+		List<Countries> countriesList = new ArrayList<>();
+		
+		for(String country : countries) {
+			countriesList.add(this.findByCode(country));
+		}
+		return countriesList;
 	}
 }
 

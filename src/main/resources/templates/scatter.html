@@ -15,6 +15,10 @@ body {
   font: 11px sans-serif;
 }
 
+p {
+	line-height: 0;
+}
+
 .axis path,
 .axis line {
   fill: none;
@@ -32,33 +36,50 @@ body {
   height: 28px;
   pointer-events: none;
 }
+
+.div-left{
+    float:left;
+    padding-left:10px;
+}
+.div-right{
+    float:right;
+    padding-right:10px;
+}
+.container1{
+	background:#50c395;
+    height:auto;
+    padding-top:5px;
+    padding-bottom:5px;
+    overflow: hidden;
+}
 </style>
 </head>
 
 <body>
-<div style="background: #50c395">
+<div class="container1">
 <h1>Selected Items:</h1>
 <hr>
+<div class="div-left">
 <h2>Countries:</h2>
 <span th:each="country, iterStat: ${countries}" th:text="!${iterStat.last} ? ${country.name} + ', ': ${country.name}"></span>
+</div>
+<div class="div-right">
 <h2>Metrics:</h2>
 <p th:each="metric: ${stats}" th:text="${metric.name}">
 </div>
-<div id="my_dataviz"></div>
-<p id="demo">
-
+</div>
+<div style="position: fixed; bottom: 0px; left: 0px;">
+<a href=".."><button class="btn btn-primary hBack" type="button">Back</button></a>
+</div>
 <div class="container mt-3">
   		<h1>Scatter Plot</h1>
-<div class="container mt-5">
   <select id="years" class="selectpicker" multiple aria-label="Default select example" data-live-search="true">
     <option th:each="year: ${listYears}" th:value="${year}" th:text="${year}"></option>
   </select>
-</div>
 <br>
   		<button id="klik" type="button" class="btn btn-primary">Submit</button>
-	</div>
-	<a href=".."><button class="btn btn-primary hBack" type="button">Back</button></a>
 	<button id="cln" type="button" class="btn btn-primary">Clean selections</button>
+	</div>
 	<div class="container mt-3">  	
 		<!-- We assign a hidden object to hold the pass variable. This allows client-side js, later, to use it -->
 		<input type="hidden" id="vrblId" name="vrblName" value="placeholder" th:value="${dataGiven}" />
@@ -71,12 +92,12 @@ body {
 	<script>
   
 function dataa(years) {
-	console.log(years)
 		// load data
 
 /* HERE ARE THE DATA! Get it from the hidden element and kill the quotes */
 	   var passedDataC = document.getElementById('vrblId').value;
 		data = JSON.parse(passedDataC);
+		console.log(data)
 		
 		var xCoordsNames = data.map(function(d) { return d.xCoord; });
 		
@@ -114,14 +135,13 @@ function dataa(years) {
   });
   
   data = newData
-  console.log(data)
   return data;
 };
 	
 function myFunction(data) {
-var margin = {top: 20, right: 20, bottom: 30, left: 40},
-    width = 960 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+var margin = {top: 20, right: 20, bottom: 30, left: 150},
+    width = 1280 - margin.left - margin.right,
+	height = 500 - margin.top - margin.bottom;
 
 // setup x 
 var xValue = function(d) { return d[d.indicator1];}, // data -> value
@@ -158,25 +178,29 @@ var tooltip = d3.select("#putTheSvg").append("div")
 
   // x-axis
   svg.append("g")
+  .data(data)
       .attr("class", "x axis")
       .attr("transform", "translate(0," + height + ")")
       .call(xAxis)
     .append("text")
       .attr("class", "label")
       .attr("x", width)
-      .attr("y", -6)
-      .style("text-anchor", "end");
+      .attr("y", 28)
+      .style("text-anchor", "end")
+      .text(function(d) { return d.indicator2; }) ;
 
   // y-axis
   svg.append("g")
+  .data(data)
       .attr("class", "y axis")
       .call(yAxis)
     .append("text")
       .attr("class", "label")
       .attr("transform", "rotate(-90)")
-      .attr("y", 6)
+      .attr("y", -40)
       .attr("dy", ".71em")
-      .style("text-anchor", "end");
+      .style("text-anchor", "end")
+      .text(function(d) { return d.indicator1; }) 
 
   // draw dots
   svg.selectAll(".dot")
