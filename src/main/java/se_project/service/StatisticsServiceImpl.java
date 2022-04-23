@@ -114,6 +114,9 @@ public class StatisticsServiceImpl implements StatisticsService {
 				}
 			}
 		}
+		if((years.get(years.size()-1) - years.get(0) < aggregationYears))
+			return json;
+		
 		List<Integer> tmpyr = new ArrayList<Integer>();
 		int tmpyear = years.get(0);
 		
@@ -160,7 +163,7 @@ public class StatisticsServiceImpl implements StatisticsService {
 		for(int i = 0;i<tmpyr.size();i++) {
 			JSONObject obj = new JSONObject();
 			obj.put("xCoord", tmpyr.get(i));
-			if(chartType == "barc")
+			if(chartType.contentEquals("barchart"))
 				obj.put("xCoord", teemp.get(0) + "-" + tmpyr.get(i));
 			teemp = teemp.subList(teemp.indexOf(tmpyr.get(i)), teemp.size());
 			
