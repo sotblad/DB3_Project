@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.thymeleaf.util.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import se_project.entity.Countries;
@@ -76,53 +77,58 @@ public class UIController {
 	    return "dashboard";
 	}
 	
+	@SuppressWarnings("unchecked")
 	@PostMapping("chart")
-	public String getChart(@ModelAttribute("chartType")String chartType, @ModelAttribute("form")Option options, Model model) {
+	public String getChart(@ModelAttribute("aggbyyears")String aggregation, @ModelAttribute("chartType")String chartType, @ModelAttribute("form")Option options, Model model) {
 		List<Countries> countriesList = countriesService.getCountriesByStrings(
 				options.getCountries().getCountryOption()
 		);
 		List<Indicators> indicatorsList = indicatorsService.getIndicatorsByStrings(
 				options.getStats().getStatisticOption()
 		);
-		JSONArray json = new JSONArray();
 		
+		JSONArray json = new JSONArray();
+		int aggregationYears = 1;
+		
+		if(!aggregation.equals("")) {
+			aggregationYears = Integer.parseInt(aggregation);
+		}
 		if(chartType.contentEquals("scatter") && indicatorsList.size() != 2) {
 			return "error";
 		}
 		
 		List<Statistics> allData = statisticsService.findByCountriesAndIndicators(countriesList, indicatorsList);
 		List<Integer> years = statisticsService.getYearsList(allData);
-		
+
 		List<Integer> selectionYears = new ArrayList<>();
 		if(chartType.contentEquals("scatter")) {
 			for(int year : years) {
-				JSONObject obj=new JSONObject();
+				HashMap<String, List<Statistics>> tmps = new HashMap<String, List<Statistics>>();
+				JSONArray tmpArr = new JSONArray();
+				JSONObject obj = new JSONObject();
 				obj.put("xCoord", year);
 				obj.put("indicator1", indicatorsList.get(0).getName());
 				obj.put("indicator2", indicatorsList.get(1).getName());
 				
-				HashMap<String, List<Statistics>> tmps = new HashMap<String, List<Statistics>>();
-				JSONArray tmpArr = new JSONArray();
 				for(Statistics stat : allData) {
 						if(stat.getYear() == year) {
 							tmps.computeIfAbsent(stat.getCountry(), k -> new ArrayList<>()).add(stat);
 						}
 				}
-			//	System.out.println(year + " " + tmps);
 				for (Entry<String, List<Statistics>> set : tmps.entrySet()) {
 					if(set.getValue().size() == indicatorsList.size()) {
-						JSONObject tmpObj=new JSONObject();
+						JSONObject tmpObj = new JSONObject();
 						int cnt = 1;
+						
 						for(Statistics stat : set.getValue()) {
 							if(!selectionYears.contains(year)) {
 								selectionYears.add(year);
 							}
-							//tmpObj.put("indicator" + cnt, stat.getIndicator());
+							
 							tmpObj.put("country", set.getKey());
 							tmpObj.put("stat" + cnt, stat.getValue());
-							cnt += 1;
+							cnt++;
 						}
-						
 						
 						tmpArr.put(tmpObj);
 					}
@@ -130,29 +136,32 @@ public class UIController {
 				obj.put("values", tmpArr);
 				json.put(obj);
 			}
-		}else {
+		}else {	
 			for(int year : years) {
-				JSONObject obj=new JSONObject();
+				JSONObject obj = new JSONObject();
 				obj.put("xCoord", year);
 				
 				JSONArray tmpArr = new JSONArray();
 				for(Statistics stat : allData) {
 					if(stat.getYear() == year) {
-						if(!selectionYears.contains(year)) {
-							selectionYears.add(year);
-						}
-						JSONObject tmpObj=new JSONObject();
+						JSONObject tmpObj = new JSONObject();
 						tmpObj.put("country", stat.getCountry());
 						tmpObj.put("pair", stat.getCountry() + " " + stat.getIndicator());
 						tmpObj.put("value", stat.getValue());
 						tmpArr.put(tmpObj);
 					}
 				}
+				
 				obj.put("values", tmpArr);
 				json.put(obj);
 			}
+			
+			if(aggregationYears != 1) {
+				json = statisticsService.getAggregatedByYear(json, aggregationYears, chartType);
+			}
+			selectionYears = years;
 		}
-		
+
 		model.addAttribute("countries", countriesList);
 		model.addAttribute("stats", indicatorsList);
 		model.addAttribute("listYears", selectionYears);

@@ -109,22 +109,6 @@ body {
   background-color: rgb(80,194,149);
 }
 
-#intro-content {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-#intro-content a {
-  text-align: center;
-  margin-top: 2em;
-}
-#intro-content img {
-  width: 75%;
-  display: inline-block;
-}
-
 #section-intro nav {
   z-index: 2;
   width: 100%;
@@ -135,7 +119,6 @@ body {
   background-color: rgb(80,194,149);
 }
 
-/* Left side of nav */
 nav #nav-left {
   order: 1;
   margin-left: 10px;
@@ -158,8 +141,6 @@ nav #nav-title {
   text-decoration: none;
 }
 
-
-/* Right side of nav */
 nav #nav-right {
   order: 2;
   margin-right: 3em;
@@ -173,15 +154,8 @@ nav .nav-right-link {
   color: white;
   text-decoration: none;
 }
+
 nav #nav-board {
-  margin-right: 2em;
-}
-
-nav #nav-code {
-  margin-right: 2em;
-}
-
-nav #nav-draw {
   margin-right: 2em;
 }
 </style>
@@ -214,7 +188,7 @@ nav #nav-draw {
                </div>
             </div>
          </div>
-         <p><strong>Select Metrics(Multiple):</strong>
+         <p><strong>Select Metrics (Multiple):</strong>
          <div class="container mt-5">
             <select class="selectpicker" th:field="*{stats.statisticOption}" multiple="multiple" required data-live-search="true">
                <option th:each="indOption: ${indOptions}"
@@ -222,7 +196,7 @@ nav #nav-draw {
             </select>
          </div>
          </p>
-         <p><strong>Select Country(Multiple):</strong>
+         <p><strong>Select Country (Multiple):</strong>
          <div class="container mt-5">
             <select class="selectpicker" th:field="*{countries.countryOption}" multiple="multiple" required data-live-search="true">
                <option th:each="countryOption: ${countryOptions}"
@@ -230,11 +204,33 @@ nav #nav-draw {
             </select>
          </div>
          </p>
+         <div style="position:absolute">
+		  <strong>Aggregate by (Optional):</strong><p>
+		  <label>
+		    <input type="checkbox" class="radio" value="5" name="aggbyyears" /> 5 Years</label>
+		  <label>
+		    <input type="checkbox" class="radio" value="10" name="aggbyyears" /> 10 Years</label>
+		  <label>
+		    <input type="checkbox" class="radio" value="20" name="aggbyyears" /> 20 Years</label>
+		</div>
          <button type="submit" class="btn btn-primary" style="display: block;margin-left: auto;margin-right: 10px;">Submit</button>
       </div>
    </form>
    </div>
 </div>
+
+<script>
+$("input:checkbox").on('click', function() {
+  var $box = $(this);
+  if ($box.is(":checked")) {
+    var group = "input:checkbox[name='" + $box.attr("name") + "']";
+    $(group).prop("checked", false);
+    $box.prop("checked", true);
+  } else {
+    $box.prop("checked", false);
+  }
+});
+</script>
 
 </body>
 </html>

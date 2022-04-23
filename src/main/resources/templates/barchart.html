@@ -101,6 +101,25 @@
 		}
 		data = newData
 		
+		var valuesByDecade;
+
+data.forEach(function(d){
+  valuesByDecade = d3.nest()
+  .key(function(d) {return d["xCoord"];}) 
+  .rollup((function(d) {
+  console.log(d)
+    return {
+    
+        cat1: d3.sum(d, function(e) { return e["cat1"]; }),
+        cat2: d3.sum(d, function(e) { return e["cat2"]; }),
+        cat3: d3.sum(d, function(e) { return e["cat3"]; }),       
+    };
+  }))
+  .entries(data);
+});
+
+//console.log(valuesByDecade)
+		
 		var xCoordsNames = data.map(function(d) { return d.xCoord; });
 		
 		var lookup = {};
