@@ -1,31 +1,17 @@
 package se_project.controller;
 
-
-
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
-import java.util.logging.Logger;
 
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.cache.spi.support.AbstractReadWriteAccess.Item;
-import org.json.CDL;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.thymeleaf.util.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import se_project.entity.Countries;
@@ -59,10 +45,8 @@ public class UIController {
 	@GetMapping("")
 	public String getTest(Model model) {
 		String[] charts = {"barchart", "trendline", "scatter"};
-		List<String> indNames = new ArrayList<>();
 		List<Indicators> indicators = indicatorsService.findAll();
 
-		List<String> countryNames = new ArrayList<>();
 		List<Countries> countries = countriesService.findAll();
 
 		model.addAttribute("countryOptionsObj", new CountryOption());
@@ -77,7 +61,6 @@ public class UIController {
 	    return "dashboard";
 	}
 	
-	@SuppressWarnings("unchecked")
 	@PostMapping("chart")
 	public String getChart(@ModelAttribute("aggbyyears")String aggregation, @ModelAttribute("chartType")String chartType, @ModelAttribute("form")Option options, Model model) {
 		List<Countries> countriesList = countriesService.getCountriesByStrings(
@@ -134,7 +117,8 @@ public class UIController {
 					}
 				}
 				obj.put("values", tmpArr);
-				json.put(obj);
+				if(tmpArr.length() != 0)
+					json.put(obj);
 			}
 		}else {	
 			for(int year : years) {
@@ -155,11 +139,10 @@ public class UIController {
 				obj.put("values", tmpArr);
 				json.put(obj);
 			}
-			
-			if(aggregationYears != 1) {
-				json = statisticsService.getAggregatedByYear(json, aggregationYears, chartType);
-			}
 			selectionYears = years;
+		}
+		if(aggregationYears != 1) {
+			json = statisticsService.getAggregatedByYear(json, aggregationYears, chartType);
 		}
 
 		model.addAttribute("countries", countriesList);

@@ -2,7 +2,6 @@ package se_project.service;
 
 import java.util.List;
 
-import se_project.entity.Countries;
 import se_project.entity.Indicators;
 
 public interface IndicatorsService {
