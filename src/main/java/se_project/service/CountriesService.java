@@ -2,16 +2,16 @@ package se_project.service;
 
 import java.util.List;
 
-import se_project.entity.Countries;
+import se_project.entity.Country;
 
 public interface CountriesService {
 
-	public List<Countries> findAll();
+	public List<Country> findAll();
 	
-	public Countries findById(int theId);
+	public Country findById(int theId);
 	
-	public Countries findByCode(String theCode);
+	public Country findByCode(String theCode);
 	
-	public List<Countries> getCountriesByStrings(List<String> countries);
+	public List<Country> getCountriesByStrings(List<String> countries);
 	
 }

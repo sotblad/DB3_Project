@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import se_project.entity.Countries;
+import se_project.entity.Country;
 import se_project.entity.CountryOption;
-import se_project.entity.Indicators;
+import se_project.entity.Indicator;
 import se_project.entity.Option;
 import se_project.entity.StatisticOption;
-import se_project.entity.Statistics;
+import se_project.entity.Statistic;
 import se_project.service.CountriesService;
 import se_project.service.IndicatorsService;
 import se_project.service.StatisticsService;
@@ -43,11 +43,11 @@ public class UIController {
 	}
 	
 	@GetMapping("")
-	public String getTest(Model model) {
+	public String getHome(Model model) {
 		String[] charts = {"barchart", "trendline", "scatter"};
-		List<Indicators> indicators = indicatorsService.findAll();
+		List<Indicator> indicators = indicatorsService.findAll();
 
-		List<Countries> countries = countriesService.findAll();
+		List<Country> countries = countriesService.findAll();
 
 		model.addAttribute("countryOptionsObj", new CountryOption());
 		model.addAttribute("countryOptions", countries);
@@ -63,10 +63,10 @@ public class UIController {
 	
 	@PostMapping("chart")
 	public String getChart(@ModelAttribute("aggbyyears")String aggregation, @ModelAttribute("chartType")String chartType, @ModelAttribute("form")Option options, Model model) {
-		List<Countries> countriesList = countriesService.getCountriesByStrings(
+		List<Country> countriesList = countriesService.getCountriesByStrings(
 				options.getCountries().getCountryOption()
 		);
-		List<Indicators> indicatorsList = indicatorsService.getIndicatorsByStrings(
+		List<Indicator> indicatorsList = indicatorsService.getIndicatorsByStrings(
 				options.getStats().getStatisticOption()
 		);
 		
@@ -80,30 +80,30 @@ public class UIController {
 			return "error";
 		}
 		
-		List<Statistics> allData = statisticsService.findByCountriesAndIndicators(countriesList, indicatorsList);
+		List<Statistic> allData = statisticsService.findByCountriesAndIndicators(countriesList, indicatorsList);
 		List<Integer> years = statisticsService.getYearsList(allData);
 
 		List<Integer> selectionYears = new ArrayList<>();
 		if(chartType.contentEquals("scatter")) {
 			for(int year : years) {
-				HashMap<String, List<Statistics>> tmps = new HashMap<String, List<Statistics>>();
+				HashMap<String, List<Statistic>> tmps = new HashMap<String, List<Statistic>>();
 				JSONArray tmpArr = new JSONArray();
 				JSONObject obj = new JSONObject();
 				obj.put("xCoord", year);
 				obj.put("indicator1", indicatorsList.get(0).getName());
 				obj.put("indicator2", indicatorsList.get(1).getName());
 				
-				for(Statistics stat : allData) {
+				for(Statistic stat : allData) {
 						if(stat.getYear() == year) {
 							tmps.computeIfAbsent(stat.getCountry(), k -> new ArrayList<>()).add(stat);
 						}
 				}
-				for (Entry<String, List<Statistics>> set : tmps.entrySet()) {
+				for (Entry<String, List<Statistic>> set : tmps.entrySet()) {
 					if(set.getValue().size() == indicatorsList.size()) {
 						JSONObject tmpObj = new JSONObject();
 						int cnt = 1;
 						
-						for(Statistics stat : set.getValue()) {
+						for(Statistic stat : set.getValue()) {
 							if(!selectionYears.contains(year)) {
 								selectionYears.add(year);
 							}
@@ -126,7 +126,7 @@ public class UIController {
 				obj.put("xCoord", year);
 				
 				JSONArray tmpArr = new JSONArray();
-				for(Statistics stat : allData) {
+				for(Statistic stat : allData) {
 					if(stat.getYear() == year) {
 						JSONObject tmpObj = new JSONObject();
 						tmpObj.put("country", stat.getCountry());

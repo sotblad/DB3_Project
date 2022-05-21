@@ -3,13 +3,13 @@ package se_project.dao;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import se_project.entity.Countries;
+import se_project.entity.Country;
 
 @Repository
-public interface CountriesDAO extends JpaRepository<Countries, Integer> {
+public interface CountriesDAO extends JpaRepository<Country, Integer> {
 	
-	public Countries findById(int theId);
+	public Country findById(int theId);
 	
-	public Countries findByCode(String theCode);
+	public Country findByCode(String theCode);
 		
 }

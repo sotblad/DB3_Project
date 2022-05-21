@@ -6,6 +6,15 @@ public class Option {
 	private CountryOption countries;
 	private StatisticOption stats;
 	
+	public Option() {
+	}
+	
+	public Option(CountryOption countries, StatisticOption stats) {
+		super();
+		this.countries = countries;
+		this.stats = stats;
+	}
+	
 	public CountryOption getCountries() {
 		return countries;
 	}

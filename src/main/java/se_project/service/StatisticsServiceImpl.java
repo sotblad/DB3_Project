@@ -13,9 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import se_project.dao.StatisticsDAO;
-import se_project.entity.Countries;
-import se_project.entity.Indicators;
-import se_project.entity.Statistics;
+import se_project.entity.Country;
+import se_project.entity.Indicator;
+import se_project.entity.Statistic;
 
 @Service
 public class StatisticsServiceImpl implements StatisticsService {
@@ -34,14 +34,14 @@ public class StatisticsServiceImpl implements StatisticsService {
 	
 	@Override
 	@Transactional
-	public List<Statistics> findAll() {
+	public List<Statistic> findAll() {
 		return statisticsRepository.findAll();
 	}
 
 	@Override
 	@Transactional
-	public Statistics findById(int theId) {
-		Statistics result = statisticsRepository.findById(theId);
+	public Statistic findById(int theId) {
+		Statistic result = statisticsRepository.findById(theId);
 				
 		if (result != null ) {
 			return result;
@@ -53,8 +53,8 @@ public class StatisticsServiceImpl implements StatisticsService {
 	
 	@Override
 	@Transactional
-	public List<Statistics> findByCountryAndIndicator(String Country, String Indicator) {
-		List<Statistics> result = statisticsRepository.findByCountryAndIndicator(Country, Indicator);
+	public List<Statistic> findByCountryAndIndicator(String Country, String Indicator) {
+		List<Statistic> result = statisticsRepository.findByCountryAndIndicator(Country, Indicator);
 				
 		if (result != null ) {
 			return result;
@@ -65,19 +65,19 @@ public class StatisticsServiceImpl implements StatisticsService {
 	}
 
 	@Override
-	public List<Statistics> findByCountriesAndIndicators(List<Countries> countries, List<Indicators> indicators) {
-		List<Statistics> allData = new ArrayList<>();
-		for(Indicators indicator : indicators) {
-			for(Countries country : countries) {
-				List<Statistics> statistics = this.findByCountryAndIndicator(country.getCode(), indicator.getCode());
-				for(Statistics statistic : statistics) {
+	public List<Statistic> findByCountriesAndIndicators(List<Country> countries, List<Indicator> indicators) {
+		List<Statistic> allData = new ArrayList<>();
+		for(Indicator indicator : indicators) {
+			for(Country country : countries) {
+				List<Statistic> statistics = this.findByCountryAndIndicator(country.getCode(), indicator.getCode());
+				for(Statistic statistic : statistics) {
 					allData.add(statistic);
 				}
 			}
 		}
 		
-		Collections.sort(allData, new Comparator<Statistics>(){
-			public int compare(Statistics o1, Statistics o2){
+		Collections.sort(allData, new Comparator<Statistic>(){
+			public int compare(Statistic o1, Statistic o2){
 				return o1.getYear() - o2.getYear();
 			}
 		});
@@ -86,9 +86,9 @@ public class StatisticsServiceImpl implements StatisticsService {
 	}
 
 	@Override
-	public List<Integer> getYearsList(List<Statistics> stats) {
+	public List<Integer> getYearsList(List<Statistic> stats) {
 		List<Integer> years = new ArrayList<>();
-		for(Statistics statistic : stats) {
+		for(Statistic statistic : stats) {
 			if(!years.contains(statistic.getYear())) {
 				years.add(statistic.getYear());
 			}

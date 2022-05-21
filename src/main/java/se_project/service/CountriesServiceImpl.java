@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import se_project.dao.CountriesDAO;
-import se_project.entity.Countries;
+import se_project.entity.Country;
 
 @Service
 public class CountriesServiceImpl implements CountriesService {
@@ -27,14 +27,14 @@ public class CountriesServiceImpl implements CountriesService {
 	
 	@Override
 	@Transactional
-	public List<Countries> findAll() {
+	public List<Country> findAll() {
 		return countriesRepository.findAll();
 	}
 
 	@Override
 	@Transactional
-	public Countries findById(int theId) {
-		Countries result = countriesRepository.findById(theId);
+	public Country findById(int theId) {
+		Country result = countriesRepository.findById(theId);
 				
 		if (result != null ) {
 			return result;
@@ -46,8 +46,8 @@ public class CountriesServiceImpl implements CountriesService {
 	
 	@Override
 	@Transactional
-	public Countries findByCode(String theCode) {
-		Countries result = countriesRepository.findByCode(theCode);
+	public Country findByCode(String theCode) {
+		Country result = countriesRepository.findByCode(theCode);
 				
 		if (result != null ) {
 			return result;
@@ -58,8 +58,8 @@ public class CountriesServiceImpl implements CountriesService {
 	}
 
 	@Override
-	public List<Countries> getCountriesByStrings(List<String> countries) {
-		List<Countries> countriesList = new ArrayList<>();
+	public List<Country> getCountriesByStrings(List<String> countries) {
+		List<Country> countriesList = new ArrayList<>();
 		
 		for(String country : countries) {
 			countriesList.add(this.findByCode(country));

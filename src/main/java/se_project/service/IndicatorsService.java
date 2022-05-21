@@ -2,16 +2,16 @@ package se_project.service;
 
 import java.util.List;
 
-import se_project.entity.Indicators;
+import se_project.entity.Indicator;
 
 public interface IndicatorsService {
 
-	public List<Indicators> findAll();
+	public List<Indicator> findAll();
 	
-	public Indicators findById(int theId);
+	public Indicator findById(int theId);
 	
-	public Indicators findByCode(String stat);
+	public Indicator findByCode(String stat);
 	
-	public List<Indicators> getIndicatorsByStrings(List<String> indicators);
+	public List<Indicator> getIndicatorsByStrings(List<String> indicators);
 	
 }
