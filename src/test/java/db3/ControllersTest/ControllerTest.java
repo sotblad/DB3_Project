@@ -14,7 +14,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
 
-import db3.controller.UIController;
+import db3.controller.MainController;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -31,7 +31,7 @@ class TestCourseController {
 	private MockMvc mockMvc;
 	
 	@Autowired
-	UIController controller;
+	MainController controller;
 
 	@BeforeEach
     public void setup() {

@@ -25,7 +25,7 @@ import db3.service.IndicatorsService;
 import db3.service.StatisticsService;
 
 @Controller
-public class UIController {
+public class MainController {
 
 	@Autowired
 	private StatisticsService statisticsService;
@@ -36,7 +36,7 @@ public class UIController {
 	@Autowired
 	private CountriesService countriesService;
 	
-	public UIController(StatisticsService theStatisticsService, IndicatorsService theIndicatorsService, CountriesService theCountriesService) {
+	public MainController(StatisticsService theStatisticsService, IndicatorsService theIndicatorsService, CountriesService theCountriesService) {
 		statisticsService = theStatisticsService;
 		indicatorsService = theIndicatorsService;
 		countriesService= theCountriesService;
