@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>CSV to D3</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta2/css/bootstrap-select.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://d3js.org/d3.v3.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta2/js/bootstrap-select.min.js"></script>
+<style>
+		body 
+		.axis path,
+		.axis line {
+  		fill: none;
+  		stroke: #000;
+  		shape-rendering: crispEdges;
+		}
+		
+		.tooltip {
+	  position: absolute;
+	  width: 200px;
+	  height: 28px;
+	  pointer-events: none;
+	}
+	
+	p {
+	line-height: 0;
+}
+	
+	.div-left{
+    float:left;
+    padding-left:10px;
+}
+.div-right{
+    float:right;
+    padding-right:10px;
+}
+.container1{
+	background:#50c395;
+    height:auto;
+    padding-top:5px;
+    padding-bottom:5px;
+    overflow: hidden;
+}
+
+	</style>
+</head>
+
+<body>
+<div class="container1">
+<h1>Selected Items:</h1>
+<hr>
+<div class="div-left">
+<h2>Countries:</h2>
+<span th:each="country, iterStat: ${countries}" th:text="!${iterStat.last} ? ${country.name} + ', ': ${country.name}"></span>
+</div>
+<div class="div-right">
+<h2>Metrics:</h2>
+<p th:each="metric: ${stats}" th:text="${metric.name}">
+</div>
+</div>
+<div style="position: fixed; bottom: 0px; left: 0px;">
+<a href=".."><button class="btn btn-primary hBack" type="button">Back</button></a>
+</div>
+<div class="container mt-3">
+  		<h1>Bar Chart </h1>
+	  <select id="years" class="selectpicker" multiple aria-label="Default select example" data-live-search="true">
+	    <option th:each="year: ${listYears}" th:value="${year}" th:text="${year}"></option>
+	  </select>
+	<br>
+  	<button id="klik" type="button" class="btn btn-primary">Submit</button>
+	<button id="cln" type="button" class="btn btn-primary">Clean selections</button>
+	</div>
+	<div class="container mt-3">  	
+		<!-- We assign a hidden object to hold the pass variable. This allows client-side js, later, to use it -->
+		<input type="hidden" id="vrblId" name="vrblName" value="placeholder" th:value="${dataGiven}" />
+		
+		<!-- placeholder to inject the svg -->
+		<div id=putTheSvg>
+		</div>
+		
+		
+	<script>
+	
+	function dataa(years) {
+		/* HERE ARE THE DATA! Get it from the hidden element and kill the quotes */
+	   var passedDataC = document.getElementById('vrblId').value;
+		data = JSON.parse(passedDataC);
+		
+		var newData = []
+		for(var i = 0;i<data.length;i++){
+			if(years.length != 0){
+				if(years.includes(data[i].xCoord))
+					newData.push(data[i])
+			}else{
+				newData.push(data[i])
+			}
+		}
+		data = newData
+		
+		var valuesByDecade;
+
+data.forEach(function(d){
+  valuesByDecade = d3.nest()
+  .key(function(d) {return d["xCoord"];}) 
+  .rollup((function(d) {
+  console.log(d)
+    return {
+    
+        cat1: d3.sum(d, function(e) { return e["cat1"]; }),
+        cat2: d3.sum(d, function(e) { return e["cat2"]; }),
+        cat3: d3.sum(d, function(e) { return e["cat3"]; }),       
+    };
+  }))
+  .entries(data);
+});
+
+//console.log(valuesByDecade)
+		
+		var xCoordsNames = data.map(function(d) { return d.xCoord; });
+		
+		var lookup = {};
+		var seriesNames = [];
+
+		for (var item, i = 0; item = data[i++];) {
+			for (var initem, j = 0; initem = item.values[j++];) {
+			  var pair = initem.pair;
+			
+			  if(!(pair in lookup)){
+			  	lookup[pair] = 1;
+			  	seriesNames.push(pair);
+			  }
+		  }
+		}
+	return [data, seriesNames, xCoordsNames];
+};
+
+function myFunction(dat) {
+
+	data = dat[0]
+    seriesNames = dat[1]
+    xCoordsNames = dat[2]
+	var margin = {top: 20, right: 0, bottom: 30, left: 150},
+    width = 1280 - margin.left - margin.right,
+	height = 500 - margin.top - margin.bottom;
+
+var x0 = d3.scale.ordinal()
+    .rangeRoundBands([0, width], .1);
+
+var x1 = d3.scale.ordinal();
+
+var y = d3.scale.linear()
+    .range([height, 0]);
+
+var xAxis = d3.svg.axis()
+    .scale(x0)
+    .tickSize(0)
+    .orient("bottom");
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left");
+
+var color = d3.scale.ordinal()
+    .range(["#ca0020","#f4a582","#d5d5d5","#92c5de","#0571b0"]);
+
+var svg = d3.select("#putTheSvg").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .attr("id", "chart")
+    .attr("style", 'display:table;margin-right:auto;margin-left:auto')
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    
+var tooltip = d3.select("#putTheSvg").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
+
+		  x0.domain(xCoordsNames);
+		  x1.domain(seriesNames).rangeRoundBands([0, x0.rangeBand()]);
+		  y.domain([0, d3.max(data, function(xCoord) { return d3.max(xCoord.values, function(d) { return d.value; }); })]);
+
+		  svg.append("g")
+		      .attr("class", "x axis")
+		      .attr("transform", "translate(0," + height + ")")
+		      .call(xAxis)
+		      .append("text")
+		      .attr("x", width)
+		      .attr("y", 15)
+		      .attr("dy", ".71em")
+		      .style("text-anchor", "end")
+		      .style('font-weight','bold')
+		      .text("Year");
+
+		  svg.append("g")
+		      .attr("class", "y axis")
+		      .style('opacity','0')
+		      .call(yAxis)
+		  .append("text")
+		      .attr("transform", "rotate(-90)")
+		      .attr("y", 6)
+		      .attr("dy", ".71em")
+		      .style("text-anchor", "end")
+		      .style('font-weight','bold')
+		      .text("Amount");
+
+		  /* svg.select('.y').transition().duration(500).delay(1300).style('opacity','1'); */
+		  svg.select('.y').style('opacity','1');
+		  
+		  var slice = svg.selectAll(".slice")
+		      .data(data)
+		      .enter().append("g")
+		      .attr("class", "g")
+		      .attr("transform",function(d) { return "translate(" + x0(d.xCoord) + ",0)"; });
+
+		  slice.selectAll("rect")
+		      .data(function(d) { return d.values; })
+		  .enter().append("rect")
+		      .attr("width", x1.rangeBand())
+		      .attr("x", function(d) { return x1(d.pair); })
+		      .style("fill", function(d) { return color(d.pair) })
+		      .attr("y", function(d) { return y(0); })
+		      .attr("height", function(d) { return height - y(0); })
+		      .on("mouseover", function(d) {
+		          d3.select(this).style("fill", d3.rgb(color(d.pair)).darker(2));
+		          tooltip.transition()
+	               .duration(200)
+	               .style("opacity", .9);
+	          tooltip.html(d.value + "<br/> (" + d.pair + ")")
+	               .style("left", (d3.event.pageX + 5) + "px")
+	               .style("top", (d3.event.pageY - 28) + "px");
+		      })
+		      .on("mouseout", function(d) {
+		          d3.select(this).style("fill", color(d.pair));
+		          tooltip.transition()
+	               .duration(500)
+	               .style("opacity", 0);
+		      });
+
+		  slice.selectAll("rect")
+		      .attr("y", function(d) { return y(d.value); })
+		      .attr("height", function(d) { return height - y(d.value); });
+
+		  //Legend
+		  var legend = svg.selectAll(".legend")
+		      .data(seriesNames.map(function(d) { return d; }).reverse())
+		  .enter().append("g")
+		      .attr("class", "legend")
+		      .attr("transform", function(d,i) { return "translate(0," + i * 20 + ")"; })
+		      .style("opacity","0");
+
+		  legend.append("rect")
+		      .attr("x", width - 18)
+		      .attr("width", 18)
+		      .attr("height", 18)
+		      .style("fill", function(d) { return color(d); });
+
+		  legend.append("text")
+		      .attr("x", width - 24)
+		      .attr("y", 9)
+		      .attr("dy", ".35em")
+		      .style("text-anchor", "end")
+		      .text(function(d) {return d; });
+
+		  legend.style("opacity","1");
+};
+
+myFunction(dataa([]));
+const slc = document.getElementById("klik");
+  slc.addEventListener("click", function () {
+  var options = document.getElementById('years').selectedOptions;
+var values = Array.from(options).map(({ value }) => parseInt(value));
+	d3.select("#chart").remove();
+    myFunction(dataa(values));
+  }, false);
+  
+  const cln = document.getElementById("cln");
+  cln.addEventListener("click", function () {
+  document.querySelectorAll('.selected').forEach(e => e.click());
+  }, false);
+
+	</script>
+</div>
+</body>
+</html>

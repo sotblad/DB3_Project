@@ -10,11 +10,11 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	
-	<groupId>SE_Project_4336_4444_4456</groupId>
-	<artifactId>SE_Project_4336_4444_4456</artifactId>
+	<groupId>DB3_4456_4336</groupId>
+	<artifactId>DB3_4456_4336</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>SE_Project_4336_4444_4456</name>
-	<description>Software Engineering Project, Group: 4336, 4444, 4456</description>
+	<name>DB3_4456_4336</name>
+	<description>Databases III, Group: 4456, 4336</description>
 	
 	<properties>
 		<java.version>1.8</java.version>

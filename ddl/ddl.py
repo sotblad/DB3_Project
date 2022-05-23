@@ -3,11 +3,10 @@ import MySQLdb
 
 mydb = MySQLdb.connect(host='localhost',
     user='root',
-    passwd='',
-    db='pvassil')
+    passwd='')
 cursor = mydb.cursor()
 
-cursor.execute("DROP DATABASE pvassil")
+cursor.execute("DROP DATABASE IF EXISTS pvassil")
 cursor.execute("CREATE DATABASE pvassil")
 cursor.execute("USE pvassil")
 
@@ -44,7 +43,7 @@ sql ='''CREATE TABLE Statistics(
 )'''
 cursor.execute(sql)
 
-csv_reader = csv.reader(open('../data/etloutput.csv'), delimiter=',')
+csv_reader = csv.reader(open('../data/joined.csv'), delimiter=',')
 line_count = 0
 years = {}
 for row in csv_reader:
