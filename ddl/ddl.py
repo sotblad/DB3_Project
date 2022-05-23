@@ -6,9 +6,9 @@ mydb = MySQLdb.connect(host='localhost',
     passwd='')
 cursor = mydb.cursor()
 
-cursor.execute("DROP DATABASE IF EXISTS pvassil")
-cursor.execute("CREATE DATABASE pvassil")
-cursor.execute("USE pvassil")
+cursor.execute("DROP DATABASE IF EXISTS db3")
+cursor.execute("CREATE DATABASE db3")
+cursor.execute("USE db3")
 
 sql ='''CREATE TABLE Countries(
    id INT NOT NULL AUTO_INCREMENT,
