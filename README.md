@@ -17,11 +17,11 @@ This project implements query selections on worldbank.com countries' data on dif
 # Run:<br/>
 
 Run the etl process on trifacta and save the output csv as `joined.csv` on the data folder.<br/>
-Run the ddl.py script on the ddl folder (edit the script to match your DB login info)
+Run the ddl.py script on the ddl folder (edit the script to match your DB login info)<br/>
 (Or simply just import the db dump [backup.dump] into mysql)
-Edit the application.properties file at src\main\resources to match your DB
-Start the project by running the MainApplication class on src\main\java\db3
-Head to 127.0.0.1:8080 to view the app.
+Edit the application.properties file at src\main\resources to match your DB<br/>
+Start the project by running the MainApplication class on src\main\java\db3<br/>
+Head to 127.0.0.1:8080 to view the app.<br/>
 
 # Problems:<br/>
 
