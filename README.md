@@ -11,8 +11,8 @@ This project implements query selections on worldbank.com countries' data on dif
 
 1. Install MySQL
 2. Install Python3 (Preferably 3.8)
- 2.2. Install the mysqlclient module (pip install mysqlclient)
-3. Install an IDE, e.g Eclipse
+3. Install the mysqlclient module (pip install mysqlclient)
+4. Install an IDE, e.g Eclipse
 
 # Run:<br/>
 
